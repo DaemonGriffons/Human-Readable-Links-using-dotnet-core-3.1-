@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,10 +17,17 @@ namespace HumanReadableLinks.Models
         [StringLength(1024, MinimumLength = 3)]
         public string Description { get; set; }
 
+
+        [Required]
+        [Display(Name ="Image Upload")]
+        public IFormFile ImageFile { get; set; }
+
         [Required]
         public double Price { get; set; }
 
 
         public string Slug { get; set; }
+
+        public string Image { get; set; }
     }
 }

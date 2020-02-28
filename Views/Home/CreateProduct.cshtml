@@ -4,13 +4,12 @@
     ViewData["Title"] = "Create Product";
 }
 
-<h1>CreateProduct</h1>
+<h1 class="text-center text-info">Create Product</h1>
 
-<h4>Product</h4>
 <hr />
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <form asp-action="CreateProduct">
+        <form asp-action="CreateProduct" enctype="multipart/form-data">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -27,11 +26,13 @@
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <input asp-for="Slug" class="form-control" />
-                <span asp-validation-for="Slug" class="text-danger"></span>
-            </div>*@
+            <div class="input-group mb-3">
+                <div class="custom-file">
+                    <input asp-for="ImageFile" accept="image/*" class="custom-file-input" />
+                    <label class="custom-file-label"  asp-for="ImageFile"></label>
+                </div>
+            </div>
+            <span asp-validation-for="ImageFile" class="text-danger"></span>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-block" />
             </div>

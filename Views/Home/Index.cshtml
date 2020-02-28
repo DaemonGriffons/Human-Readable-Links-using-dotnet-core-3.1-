@@ -40,8 +40,12 @@ else
             <tbody>
                 @foreach (var product in Model)
                 {
+                    var imageUrl = $"/api/Images/{product.Image}";
                     <tr>
                         <th scope="row">@product.Id</th>
+                        <td>
+                            <img alt="@product.Name image" src="@imageUrl" style="height:100px;" class="img-thumbnail img-fluid" />
+                        </td>
                         <td>@product.Name</td>
                         <td>@product.Description</td>
                         <td>@product.Price.ToString("c")</td>

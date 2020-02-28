@@ -9,6 +9,7 @@ using HumanReadableLinks.Models;
 using HumanReadableLinks.Data;
 using Microsoft.EntityFrameworkCore;
 using HumanReadableLinks.Services;
+using Microsoft.Extensions.Options;
 
 namespace HumanReadableLinks.Controllers
 {
@@ -17,11 +18,15 @@ namespace HumanReadableLinks.Controllers
 
         private readonly ApplicationDbContext _context;
         private readonly ISlugifier _slugifier;
+        private readonly IFileManager _fileManager;
+        private readonly PhotoSettings _photoSettings;
 
-        public HomeController(ApplicationDbContext context, ISlugifier slugifier)
+        public HomeController(ApplicationDbContext context, ISlugifier slugifier, IFileManager fileManager, IOptionsSnapshot<PhotoSettings> options)
         {
             _context = context;
             _slugifier = slugifier;
+            _fileManager = fileManager;
+            _photoSettings = options.Value;
         }
 
         public async Task<IActionResult> Index()
@@ -60,12 +65,28 @@ namespace HumanReadableLinks.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (model.ImageFile == null)
+                {
+                    ModelState.AddModelError(string.Empty, "You Have to Upload An Image!");
+                    return View(model);
+                }
+                if(model.ImageFile.Length>= _photoSettings.MaxBytes)
+                {
+                    ModelState.AddModelError(string.Empty, "Image File size Exceeded");
+                    return View(model);
+                }
+                if (!_photoSettings.IsSupported(model.ImageFile.FileName))
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid File Type");
+                    return View(model);
+                }
                 var product = new Product
                 {
                     Name = model.Name,
                     Description = model.Description,
                     Price = model.Price,
-                    Slug = _slugifier.CreateSlug(model.Name)
+                    Slug = _slugifier.CreateSlug(model.Name),
+                    Image = _fileManager.SaveImage(model.ImageFile)
                 };
                 await _context.Products.AddAsync(product);
                 await _context.SaveChangesAsync();
@@ -92,6 +113,7 @@ namespace HumanReadableLinks.Controllers
                 Description = product.Description,
                 Price = product.Price,
                 Slug = product.Slug,
+                Image = product.Image
             };
             return View(model);
         }
@@ -102,6 +124,7 @@ namespace HumanReadableLinks.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 var product = new Product
                 {
                     Id = model.Id,
@@ -111,6 +134,19 @@ namespace HumanReadableLinks.Controllers
                     Slug = _slugifier.CreateSlug(model.Name)
                 };
 
+                if (model.ImageFile == null)
+                {
+                    product.Image = model.Image;
+                }
+                else
+                {
+                    if (!String.IsNullOrWhiteSpace(model.Image))
+                    {
+                        _fileManager.RemoveImage(model.Image);
+                    }
+
+                    product.Image = _fileManager.SaveImage(model.ImageFile);
+                }
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -130,6 +166,7 @@ namespace HumanReadableLinks.Controllers
             }
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
+            _fileManager.RemoveImage(product.Image);
             return RedirectToAction(nameof(Index));
         }
 

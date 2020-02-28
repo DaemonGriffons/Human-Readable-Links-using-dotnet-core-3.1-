@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using HumanReadableLinks.Services;
+using HumanReadableLinks.Models;
 
 namespace HumanReadableLinks
 {
@@ -33,11 +34,13 @@ namespace HumanReadableLinks
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
             services.AddControllersWithViews();
             services.AddRazorPages();
 
 
             services.AddScoped<ISlugifier, Slugifier>();
+            services.AddScoped<IFileManager, FileManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
