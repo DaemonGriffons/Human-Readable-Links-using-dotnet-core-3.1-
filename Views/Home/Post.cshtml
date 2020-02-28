@@ -15,9 +15,10 @@
     <div class="col-md-6">
         <div class="card mb-3">
             <img src="@imageUrl" class="card-img-top" alt="@Model.Name Image" />
-            <div class="card-body">
-                <h5 class="card-title text-center">@Model.Name</h5>
+            <div class="card-body text-center">
+                <h5 class="card-title">@Model.Name</h5>
                 <p class="card-text">@Model.Description</p>
+                <p class="card-text text-muted">@link</p>
             </div>
             <div class="card-footer text-muted text-center">
                 <small class="text-center">@Model.Price.ToString("c")</small>

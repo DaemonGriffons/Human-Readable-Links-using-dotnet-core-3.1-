@@ -35,15 +35,15 @@ namespace HumanReadableLinks.Controllers
             return View(products);
         }
 
-        [Route("/post/{slug}")]
+        [Route("/post/{slug}/")]
         [HttpGet]
         public IActionResult Redirects(string slug)
         {
-            return LocalRedirectPermanent($"/product/{slug}");
+            return LocalRedirectPermanent($"/product/{slug}/");
         }
 
         [HttpGet]
-        [Route("/product/{slug}")]
+        [Route("/product/{slug}/")]
         public async Task<IActionResult> Post(string slug)
         {
             var product = await _context.Products.FirstOrDefaultAsync(x => x.Slug.Equals(slug));
